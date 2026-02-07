@@ -12,49 +12,42 @@ export default function ProductCard({ product }: Props) {
   const isOutOfStock = product.stock === 0
 
   return (
-    <div className="border rounded p-4 flex flex-col gap-2">
-      {/* Product name */}
-      <h3 className="font-semibold">{product.name}</h3>
+    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all p-4 flex flex-col justify-between">
+      {/* Product Image */}
+      <img
+        src={product.image}
+        alt={product.name}
+        className="h-48 w-full object-contain mb-4 rounded"
+      />
 
-      {/* Price */}
-      <p className="text-sm">₦{product.price.toLocaleString()}</p>
+      {/* Product Info */}
+      <div className="flex-1 flex flex-col justify-between">
+        <h3 className="text-lg font-bold mb-2">{product.name}</h3>
+        <p className="text-gray-700 font-semibold mb-2">
+          ₦{product.price.toLocaleString()}
+        </p>
+        <p
+          className={`text-sm font-medium mb-3 ${
+            isOutOfStock ? "text-red-600" : "text-green-600"
+          }`}
+        >
+          {isOutOfStock ? "Out of Stock" : `In stock: ${product.stock}`}
+        </p>
+      </div>
 
-      {/* Stock status */}
-      {isOutOfStock ? (
-        <span className="text-red-600 text-sm font-medium">
-          Out of Stock
-        </span>
-      ) : (
-        <span className="text-green-600 text-sm">
-          In stock: {product.stock}
-        </span>
-      )}
-
-      {/* Add to cart button 
+      {/* Add to Cart */}
       <button
         onClick={() => addToCart(product)}
         disabled={isOutOfStock}
-        className={`mt-auto px-3 py-2 rounded text-white text-sm
-          ${isOutOfStock ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"}
-        `}
+        className={`mt-auto py-2 rounded-lg font-semibold text-white w-full transition-all ${
+          isOutOfStock
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+        }`}
       >
-        Add to Cart
-      </button> */}
-      <button
-        onClick={() => {
-        console.log("ADDING TO CART:", product.name)
-        addToCart(product)
-       }}
-       disabled={isOutOfStock}
-       className={`mt-auto px-3 py-2 rounded text-white text-sm
-         ${isOutOfStock ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"}
-     `}
->
-        Add to Cart
+        {isOutOfStock ? "Unavailable" : "Add to Cart"}
       </button>
-
-
-
+      
     </div>
   )
 }
