@@ -30,7 +30,7 @@ export default function ProductCard({ product }: Props) {
         </span>
       )}
 
-      {/* Add to cart button */}
+      {/* Add to cart button 
       <button
         onClick={() => addToCart(product)}
         disabled={isOutOfStock}
@@ -39,7 +39,22 @@ export default function ProductCard({ product }: Props) {
         `}
       >
         Add to Cart
+      </button> */}
+      <button
+        onClick={() => {
+        console.log("ADDING TO CART:", product.name)
+        addToCart(product)
+       }}
+       disabled={isOutOfStock}
+       className={`mt-auto px-3 py-2 rounded text-white text-sm
+         ${isOutOfStock ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"}
+     `}
+>
+        Add to Cart
       </button>
+
+
+
     </div>
   )
 }
