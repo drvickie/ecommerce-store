@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 import { fetchProducts } from "@/lib/api"
+import ProductCard from "@/components/ProductCard"
 
 export default function HomePage() {
   const { data, isLoading, isError } = useQuery({
@@ -9,14 +10,18 @@ export default function HomePage() {
     queryFn: fetchProducts,
   })
 
-  if (isLoading) return <div>Loading...</div>
-  if (isError) return <div>Error loading products</div>
+  if (isLoading) return <div className="p-4">Loading products...</div>
+  if (isError) return <div className="p-4">Failed to load products.</div>
 
   return (
-    <div>
-      {data?.map(p => (
-        <div key={p.id}>{p.name}</div>
-      ))}
-    </div>
+    <main className="p-6">
+      <h1 className="text-xl font-bold mb-4">Household Gadgets</h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {data.map(product => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    </main>
   )
 }
