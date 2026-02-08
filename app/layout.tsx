@@ -1,3 +1,4 @@
+import "../src/styles.css"
 import Header from "@/components/Header"
 import Providers from "./providers"
 
