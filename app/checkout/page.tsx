@@ -19,39 +19,26 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  if (cartItems.length === 0) {
-    return <p>Your cart is empty. Cannot proceed to checkout.</p>
-  }
+  if (cartItems.length === 0) return <p style={{ textAlign: "center", marginTop: 50 }}>Your cart is empty.</p>
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  )
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const vat = subtotal * 0.075
   const total = subtotal + vat
 
-  function handleChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }))
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-
     const result = checkoutSchema.safeParse(formData)
 
     if (!result.success) {
       const fieldErrors: Record<string, string> = {}
-      if (result.error && Array.isArray(result.error.errors)) {
-        result.error.errors.forEach(err => {
-          const field = err.path[0] ? String(err.path[0]) : "_form"
-          fieldErrors[field] = err.message
-        })
-      }
+      result.error?.errors.forEach(err => {
+        const field = err.path[0] ? String(err.path[0]) : "_form"
+        fieldErrors[field] = err.message
+      })
       setErrors(fieldErrors)
       return
     }
@@ -59,52 +46,45 @@ export default function CheckoutPage() {
     setErrors({})
 
     if (!(window as any).PaystackPop) {
-      alert("Paystack script not loaded. Please refresh the page.")
+      alert("Paystack script not loaded. Please refresh.")
       return
     }
 
     const reference = generateReference()
-
     const handler = (window as any).PaystackPop.setup({
-      key: "pk_test_c192cf9712d90cb2ef49c4ab3a99b23137a0f068", // 🔴 Replace with your Paystack PUBLIC key
+      key: "pk_test_c192cf9712d90cb2ef49c4ab3a99b23137a0f068", // 🔴 Replace with your Paystack public key
       email: result.data.email,
       amount: Math.round(total * 100),
       currency: "NGN",
       ref: reference,
       metadata: {
         custom_fields: [
-          {
-            display_name: "Customer Name",
-            variable_name: "customer_name",
-            value: result.data.fullName,
-          },
-          {
-            display_name: "Phone Number",
-            variable_name: "phone",
-            value: result.data.phone,
-          },
-        ],
+          { display_name: "Customer Name", variable_name: "customer_name", value: result.data.fullName },
+          { display_name: "Phone Number", variable_name: "phone", value: result.data.phone },
+        ]
       },
-      callback: function (response: any) {
+      callback: (response: any) => {
         clearCart()
         router.push(`/confirmation?ref=${response.reference}`)
       },
-      onClose: function () {
-        alert("Payment cancelled")
-      },
+      onClose: () => alert("Payment cancelled")
     })
 
     handler.openIframe()
   }
 
-  return (
-    <main style={{ padding: 24, maxWidth: 600, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 28, marginBottom: 24 }}>Checkout</h1>
+  const inputStyle = (field: string) => ({
+    padding: 8,
+    fontSize: 16,
+    border: errors[field] ? "1px solid red" : "1px solid #ccc",
+    borderRadius: 4
+  })
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
-      >
+  return (
+    <main className="container">
+      <h1>Checkout</h1>
+
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {/* Full Name */}
         <div style={{ display: "flex", flexDirection: "column" }}>
           <label>Full Name</label>
@@ -113,21 +93,10 @@ export default function CheckoutPage() {
             placeholder="John Doe"
             value={formData.fullName}
             onChange={handleChange}
-            style={{
-              padding: 8,
-              fontSize: 16,
-              border: errors.fullName ? "1px solid red" : "1px solid #ccc",
-              borderRadius: 4,
-            }}
+            style={inputStyle("fullName")}
           />
-          <small style={{ color: "#555", fontSize: 12 }}>
-            Must be at least 3 characters
-          </small>
-          {errors.fullName && (
-            <span style={{ color: "red", fontSize: 14, marginTop: 4 }}>
-              {errors.fullName}
-            </span>
-          )}
+          <small>At least 3 characters</small>
+          {errors.fullName && <span className="error">{errors.fullName}</span>}
         </div>
 
         {/* Email */}
@@ -138,21 +107,10 @@ export default function CheckoutPage() {
             placeholder="you@example.com"
             value={formData.email}
             onChange={handleChange}
-            style={{
-              padding: 8,
-              fontSize: 16,
-              border: errors.email ? "1px solid red" : "1px solid #ccc",
-              borderRadius: 4,
-            }}
+            style={inputStyle("email")}
           />
-          <small style={{ color: "#555", fontSize: 12 }}>
-            Must be a valid email address
-          </small>
-          {errors.email && (
-            <span style={{ color: "red", fontSize: 14, marginTop: 4 }}>
-              {errors.email}
-            </span>
-          )}
+          <small>Must be a valid email</small>
+          {errors.email && <span className="error">{errors.email}</span>}
         </div>
 
         {/* Phone */}
@@ -163,21 +121,10 @@ export default function CheckoutPage() {
             placeholder="08012345678"
             value={formData.phone}
             onChange={handleChange}
-            style={{
-              padding: 8,
-              fontSize: 16,
-              border: errors.phone ? "1px solid red" : "1px solid #ccc",
-              borderRadius: 4,
-            }}
+            style={inputStyle("phone")}
           />
-          <small style={{ color: "#555", fontSize: 12 }}>
-            At least 10 digits, numbers only
-          </small>
-          {errors.phone && (
-            <span style={{ color: "red", fontSize: 14, marginTop: 4 }}>
-              {errors.phone}
-            </span>
-          )}
+          <small>At least 10 digits</small>
+          {errors.phone && <span className="error">{errors.phone}</span>}
         </div>
 
         {/* Address */}
@@ -188,53 +135,20 @@ export default function CheckoutPage() {
             placeholder="123 Main Street, Lagos"
             value={formData.address}
             onChange={handleChange}
-            style={{
-              padding: 8,
-              fontSize: 16,
-              border: errors.address ? "1px solid red" : "1px solid #ccc",
-              borderRadius: 4,
-            }}
+            style={inputStyle("address")}
           />
-          <small style={{ color: "#555", fontSize: 12 }}>
-            At least 5 characters
-          </small>
-          {errors.address && (
-            <span style={{ color: "red", fontSize: 14, marginTop: 4 }}>
-              {errors.address}
-            </span>
-          )}
+          <small>At least 5 characters</small>
+          {errors.address && <span className="error">{errors.address}</span>}
         </div>
 
-        {/* General errors fallback */}
-        {errors._form && (
-          <p style={{ color: "red", fontSize: 14 }}>{errors._form}</p>
-        )}
-
-        <hr style={{ margin: "16px 0" }} />
-
         {/* Totals */}
-        <div>
+        <div className="checkout-totals">
           <p>Subtotal: ₦{subtotal.toLocaleString()}</p>
           <p>VAT (7.5%): ₦{vat.toLocaleString()}</p>
           <strong>Total: ₦{total.toLocaleString()}</strong>
         </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          style={{
-            marginTop: 24,
-            padding: "12px 0",
-            backgroundColor: "#1a73e8",
-            color: "white",
-            fontSize: 18,
-            border: "none",
-            borderRadius: 6,
-            cursor: "pointer",
-          }}
-        >
-          Proceed to Payment
-        </button>
+        <button type="submit">Proceed to Payment</button>
       </form>
     </main>
   )

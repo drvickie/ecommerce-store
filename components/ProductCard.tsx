@@ -1,53 +1,33 @@
 "use client"
 
-import { Product } from "@/types"
-import { useCart } from "@/context/CartContext"
-
-type Props = {
-  product: Product
+interface Product {
+  id: number
+  title: string
+  price: number
+  stock: number
+  image: string
 }
 
-export default function ProductCard({ product }: Props) {
-  const { addToCart } = useCart()
-  const isOutOfStock = product.stock === 0
+interface ProductCardProps {
+  product: Product
+  addToCart: (product: Product) => void
+}
 
+export default function ProductCard({ product, addToCart }: ProductCardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all p-4 flex flex-col justify-between">
-      {/* Product Image */}
-      <img
-        src={product.image}
-        alt={product.name}
-        className="h-48 w-full object-contain mb-4 rounded"
-      />
-
-      {/* Product Info */}
-      <div className="flex-1 flex flex-col justify-between">
-        <h3 className="text-lg font-bold mb-2">{product.name}</h3>
-        <p className="text-gray-700 font-semibold mb-2">
-          ₦{product.price.toLocaleString()}
-        </p>
-        <p
-          className={`text-sm font-medium mb-3 ${
-            isOutOfStock ? "text-red-600" : "text-green-600"
-          }`}
-        >
-          {isOutOfStock ? "Out of Stock" : `In stock: ${product.stock}`}
-        </p>
+    <div className="product-card">
+      <img src={product.image} alt={product.title} />
+      <div className="card-content">
+        <h3>{product.title}</h3>
+        <p>₦{product.price.toLocaleString()}</p>
+        <span className={`stock ${product.stock > 0 ? "in-stock" : "out-of-stock"}`}>
+          {product.stock > 0 ? "In Stock" : "Out of Stock"}
+        </span>
+        <button disabled={product.stock === 0} onClick={() => addToCart(product)}>
+          Add to Cart
+        </button>
       </div>
-
-      {/* Add to Cart */}
-      <button
-        onClick={() => addToCart(product)}
-        disabled={isOutOfStock}
-        className={`mt-auto py-2 rounded-lg font-semibold text-white w-full transition-all ${
-          isOutOfStock
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
-        }`}
-      >
-        {isOutOfStock ? "Unavailable" : "Add to Cart"}
-      </button>
-      
+  
     </div>
   )
 }
