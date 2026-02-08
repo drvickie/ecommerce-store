@@ -7,7 +7,7 @@ import { checkoutSchema, CheckoutFormData } from "@/lib/checkoutSchema"
 import { generateReference } from "@/lib/paystack"
 
 export default function CheckoutPage() {
-  const { cartItems } = useCart()
+  const { cartItems, clearCart } = useCart()
   const router = useRouter()
 
   const [formData, setFormData] = useState<CheckoutFormData>({
@@ -19,7 +19,6 @@ export default function CheckoutPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Guard: no checkout with empty cart
   if (cartItems.length === 0) {
     return <p>Your cart is empty. Cannot proceed to checkout.</p>
   }
@@ -47,24 +46,29 @@ export default function CheckoutPage() {
 
     if (!result.success) {
       const fieldErrors: Record<string, string> = {}
-      result.error.errors.forEach(err => {
-        const field = err.path[0]
-        if (field) {
-          fieldErrors[field as string] = err.message
-        }
-      })
+      if (result.error && Array.isArray(result.error.errors)) {
+        result.error.errors.forEach(err => {
+          const field = err.path[0] ? String(err.path[0]) : "_form"
+          fieldErrors[field] = err.message
+        })
+      }
       setErrors(fieldErrors)
       return
     }
 
     setErrors({})
 
+    if (!(window as any).PaystackPop) {
+      alert("Paystack script not loaded. Please refresh the page.")
+      return
+    }
+
     const reference = generateReference()
 
     const handler = (window as any).PaystackPop.setup({
-      key: "pk_test_c192cf9712d90cb2ef49c4ab3a99b23137a0f068", // 🔴 REPLACE with your Paystack PUBLIC key
+      key: "pk_test_c192cf9712d90cb2ef49c4ab3a99b23137a0f068", // 🔴 Replace with your Paystack PUBLIC key
       email: result.data.email,
-      amount: Math.round(total * 100), // Paystack uses kobo
+      amount: Math.round(total * 100),
       currency: "NGN",
       ref: reference,
       metadata: {
@@ -82,6 +86,7 @@ export default function CheckoutPage() {
         ],
       },
       callback: function (response: any) {
+        clearCart()
         router.push(`/confirmation?ref=${response.reference}`)
       },
       onClose: function () {
@@ -93,60 +98,141 @@ export default function CheckoutPage() {
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 600 }}>
-      <h1>Checkout</h1>
+    <main style={{ padding: 24, maxWidth: 600, margin: "0 auto" }}>
+      <h1 style={{ fontSize: 28, marginBottom: 24 }}>Checkout</h1>
 
-      <form onSubmit={handleSubmit}>
-        <div>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: 16 }}
+      >
+        {/* Full Name */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label>Full Name</label>
           <input
             name="fullName"
-            placeholder="Full Name"
+            placeholder="John Doe"
             value={formData.fullName}
             onChange={handleChange}
+            style={{
+              padding: 8,
+              fontSize: 16,
+              border: errors.fullName ? "1px solid red" : "1px solid #ccc",
+              borderRadius: 4,
+            }}
           />
-          {errors.fullName && <p>{errors.fullName}</p>}
+          <small style={{ color: "#555", fontSize: 12 }}>
+            Must be at least 3 characters
+          </small>
+          {errors.fullName && (
+            <span style={{ color: "red", fontSize: 14, marginTop: 4 }}>
+              {errors.fullName}
+            </span>
+          )}
         </div>
 
-        <div>
+        {/* Email */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label>Email</label>
           <input
             name="email"
-            placeholder="Email"
+            placeholder="you@example.com"
             value={formData.email}
             onChange={handleChange}
+            style={{
+              padding: 8,
+              fontSize: 16,
+              border: errors.email ? "1px solid red" : "1px solid #ccc",
+              borderRadius: 4,
+            }}
           />
-          {errors.email && <p>{errors.email}</p>}
+          <small style={{ color: "#555", fontSize: 12 }}>
+            Must be a valid email address
+          </small>
+          {errors.email && (
+            <span style={{ color: "red", fontSize: 14, marginTop: 4 }}>
+              {errors.email}
+            </span>
+          )}
         </div>
 
-        <div>
+        {/* Phone */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label>Phone Number</label>
           <input
             name="phone"
-            placeholder="Phone Number"
+            placeholder="08012345678"
             value={formData.phone}
             onChange={handleChange}
+            style={{
+              padding: 8,
+              fontSize: 16,
+              border: errors.phone ? "1px solid red" : "1px solid #ccc",
+              borderRadius: 4,
+            }}
           />
-          {errors.phone && <p>{errors.phone}</p>}
+          <small style={{ color: "#555", fontSize: 12 }}>
+            At least 10 digits, numbers only
+          </small>
+          {errors.phone && (
+            <span style={{ color: "red", fontSize: 14, marginTop: 4 }}>
+              {errors.phone}
+            </span>
+          )}
         </div>
 
-        <div>
+        {/* Address */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <label>Delivery Address</label>
           <textarea
             name="address"
-            placeholder="Delivery Address"
+            placeholder="123 Main Street, Lagos"
             value={formData.address}
             onChange={handleChange}
+            style={{
+              padding: 8,
+              fontSize: 16,
+              border: errors.address ? "1px solid red" : "1px solid #ccc",
+              borderRadius: 4,
+            }}
           />
-          {errors.address && <p>{errors.address}</p>}
+          <small style={{ color: "#555", fontSize: 12 }}>
+            At least 5 characters
+          </small>
+          {errors.address && (
+            <span style={{ color: "red", fontSize: 14, marginTop: 4 }}>
+              {errors.address}
+            </span>
+          )}
         </div>
 
-        <hr />
+        {/* General errors fallback */}
+        {errors._form && (
+          <p style={{ color: "red", fontSize: 14 }}>{errors._form}</p>
+        )}
 
-        <p>Subtotal: ₦{subtotal.toLocaleString()}</p>
-        <p>VAT (7.5%): ₦{vat.toLocaleString()}</p>
-        <strong>Total: ₦{total.toLocaleString()}</strong>
+        <hr style={{ margin: "16px 0" }} />
 
-        <br />
-        <br />
+        {/* Totals */}
+        <div>
+          <p>Subtotal: ₦{subtotal.toLocaleString()}</p>
+          <p>VAT (7.5%): ₦{vat.toLocaleString()}</p>
+          <strong>Total: ₦{total.toLocaleString()}</strong>
+        </div>
 
-        <button type="submit">
+        {/* Submit Button */}
+        <button
+          type="submit"
+          style={{
+            marginTop: 24,
+            padding: "12px 0",
+            backgroundColor: "#1a73e8",
+            color: "white",
+            fontSize: 18,
+            border: "none",
+            borderRadius: 6,
+            cursor: "pointer",
+          }}
+        >
           Proceed to Payment
         </button>
       </form>
