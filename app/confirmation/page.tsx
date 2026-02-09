@@ -1,19 +1,20 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 import { useEffect } from "react"
-import Link from "next/link"
 import { useCart } from "@/context/CartContext"
 
 export default function ConfirmationPage() {
   const params = useSearchParams()
+  const router = useRouter()
   const ref = params.get("ref")
   const { clearCart } = useCart()
 
-  // Ensure cart is cleared after successful payment
+  // ✅ Clear cart ONCE after successful payment
   useEffect(() => {
     clearCart()
-  }, [clearCart])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <main
@@ -41,21 +42,20 @@ export default function ConfirmationPage() {
         </p>
       )}
 
-      <Link href="/">
-        <button
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#1a73e8",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            cursor: "pointer",
-            fontSize: 16,
-          }}
-        >
-          Continue Shopping
-        </button>
-      </Link>
+      <button
+        onClick={() => router.push("/")}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#1a73e8",
+          color: "#fff",
+          border: "none",
+          borderRadius: 6,
+          cursor: "pointer",
+          fontSize: 16,
+        }}
+      >
+        Continue Shopping
+      </button>
     </main>
   )
 }
