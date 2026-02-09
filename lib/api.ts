@@ -24,21 +24,25 @@ type ProductsResponse = {
  * Fetch products from API and normalize for frontend
  */
 export async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch("https://api.oluwasetemi.dev/products")
+  const res = await fetch("https://api.oluwasetemi.dev/products", {
+    cache: "no-store", // ensures fresh data in production
+  })
 
   if (!res.ok) {
-    throw new Error(`Failed to fetch products: ${res.status} ${res.statusText}`)
+    throw new Error(
+      `Failed to fetch products: ${res.status} ${res.statusText}`
+    )
   }
 
   const json: ProductsResponse = await res.json()
 
-  // 🔑 NORMALIZATION STEP
+  // 🔑 NORMALIZATION STEP (single source of truth)
   return json.data.map(product => ({
     id: product.id,
-    title: product.name || "Untitled Product", // mapped to ProductCard title
+    name: product.name || "Unnamed Product",
     price: typeof product.price === "number" ? product.price : 0,
-    stock: typeof product.quantity === "number" ? product.quantity : 0, // mapped to stock
+    stock: typeof product.quantity === "number" ? product.quantity : 0,
     category: product.category || "Uncategorized",
-    image: product.image || "/placeholder.jpeg", // fallback if no image
+    image: product.image || "/placeholder.jpeg",
   }))
 }
