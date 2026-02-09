@@ -155,5 +155,5 @@ span.error {
 /* ------------------- General Layout ------------------- */
 .container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: auto;
 }
