@@ -10,7 +10,7 @@ export default function ConfirmationClient() {
   const ref = params.get("ref")
   const { clearCart } = useCart()
 
-  // ✅ Clear cart ONCE after successful payment
+  // ✅ Clear cart ONCE after successful payment (safe, no loop)
   useEffect(() => {
     clearCart()
     // eslint-disable-next-line react-hooks/exhaustive-deps
