@@ -1,27 +1,17 @@
 "use client"
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  ReactNode,
-} from "react"
+import { createContext, useContext, useEffect, useState, ReactNode } from "react"
+import { Product } from "@/types"
 
 /* ---------------- TYPES ---------------- */
 
-export interface CartItem {
-  id: number
-  title: string
-  price: number
-  image: string
-  stock: number
+export interface CartItem extends Product {
   quantity: number
 }
 
 interface CartContextType {
   cartItems: CartItem[]
-  addToCart: (product: Omit<CartItem, "quantity">) => void
+  addToCart: (product: Product) => void
   removeFromCart: (id: number) => void
   updateQuantity: (id: number, quantity: number) => void
   clearCart: () => void
@@ -51,7 +41,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cartItems])
 
   /* ---------- ADD TO CART ---------- */
-  function addToCart(product: Omit<CartItem, "quantity">) {
+  function addToCart(product: Product) {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id)
 
@@ -95,10 +85,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("cart")
   }
 
-  const cartCount = cartItems.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  )
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
     <CartContext.Provider
