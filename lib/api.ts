@@ -39,6 +39,6 @@ export async function fetchProducts(): Promise<Product[]> {
     price: typeof product.price === "number" ? product.price : 0,
     stock: typeof product.quantity === "number" ? product.quantity : 0, // mapped to stock
     category: product.category || "Uncategorized",
-    image: product.image || "/placeholder.png", // fallback if no image
+    image: product.image || "/placeholder.jpeg", // fallback if no image
   }))
 }
