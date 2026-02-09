@@ -9,22 +9,21 @@ import { Product } from "@/types"
 export default function HomePage() {
   const { addToCart } = useCart()
 
-  // ✅ Explicitly type the query
   const { data: products = [], isLoading, isError, error } = useQuery<Product[]>({
     queryKey: ["products"],
     queryFn: fetchProducts,
   })
 
   if (isLoading) return <p style={{ textAlign: "center" }}>Loading products...</p>
-
-  if (isError) return (
-    <p style={{ textAlign: "center", color: "red" }}>
-      Error: {(error as Error).message}
-    </p>
-  )
+  if (isError)
+    return (
+      <p style={{ textAlign: "center", color: "red" }}>
+        Error: {(error as Error).message}
+      </p>
+    )
 
   return (
-    <main className="container">
+    <main className="container" style={{ padding: "24px" }}>
       <h1 style={{ marginBottom: 24, textAlign: "center" }}>Our Products</h1>
 
       <div
@@ -35,7 +34,7 @@ export default function HomePage() {
           gap: 24,
         }}
       >
-        {products.map((product: Product) => (
+        {products.map(product => (
           <ProductCard key={product.id} product={product} addToCart={addToCart} />
         ))}
       </div>

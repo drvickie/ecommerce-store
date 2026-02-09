@@ -1,3 +1,4 @@
+// Single source of truth for Product
 export type Product = {
   id: number
   name: string
