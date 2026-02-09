@@ -28,13 +28,15 @@ export default function CartPage() {
             background: "#fff",
             padding: 12,
             borderRadius: 6,
-            boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+            boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
           }}
         >
-          <img src={item.image} alt={item.title} width={100} style={{ borderRadius: 4 }} />
+          <img src={item.image} alt={item.name} width={100} style={{ borderRadius: 4 }} />
+
           <div style={{ marginLeft: 12, flex: 1 }}>
-            <h3>{item.title}</h3>
+            <h3>{item.name}</h3>
             <p>₦{item.price.toLocaleString()}</p>
+
             <input
               type="number"
               value={item.quantity}
@@ -43,6 +45,7 @@ export default function CartPage() {
               onChange={e => updateQuantity(item.id, Number(e.target.value))}
               style={{ width: 60, padding: 4, marginTop: 4 }}
             />
+
             <button onClick={() => removeFromCart(item.id)} style={{ marginTop: 8 }}>
               Remove
             </button>
