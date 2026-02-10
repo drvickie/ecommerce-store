@@ -1,5 +1,4 @@
 "use client"
-
 import { useSearchParams, useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { useCart } from "@/context/CartContext"
@@ -10,24 +9,21 @@ export default function ConfirmationClient() {
   const ref = params.get("ref")
   const { clearCart } = useCart()
 
-  // ✅ Clear cart ONCE after successful payment (safe, no loop)
+  // Clear cart once
   useEffect(() => {
     clearCart()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [clearCart])
 
   return (
-    <main
-      style={{
-        maxWidth: 600,
-        margin: "80px auto",
-        background: "#ffffff",
-        padding: 32,
-        borderRadius: 8,
-        textAlign: "center",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-      }}
-    >
+    <main style={{
+      maxWidth: 600,
+      margin: "80px auto",
+      background: "#ffffff",
+      padding: 32,
+      borderRadius: 8,
+      textAlign: "center",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+    }}>
       <h1 style={{ color: "green", marginBottom: 16 }}>
         Payment Successful 🎉
       </h1>
