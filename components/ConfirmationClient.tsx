@@ -12,7 +12,7 @@ export default function ConfirmationClient() {
   // Clear cart once
   useEffect(() => {
     clearCart()
-  }, [clearCart])
+  }, [])
 
   return (
     <main style={{
