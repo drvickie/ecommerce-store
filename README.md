@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Project Title & Overview
+# Gadget Store (E-commerce App)
 
-## Getting Started
+This is a simple e-commerce web application built with Next.js.  
+Users can browse products, add items to cart, and complete payments using Paystack (test mode).
 
-First, run the development server:
+Tech Stack & Justification (IMPORTANT)
+## Tech Stack
 
+- **Next.js (App Router)**  
+  Used for routing, page rendering, and production-ready deployment.
+
+- **TypeScript**  
+  Provides type safety and prevents runtime errors.
+
+- **React Query (TanStack Query)**  
+  Handles data fetching, caching, and loading states for products.
+
+- **Zod**  
+  Used for form validation during checkout to ensure correct user input.
+
+- **Paystack (Test Mode)**  
+  Handles secure online payments.
+
+- **Vanilla CSS**  
+  Used for styling to keep the project simple and framework-agnostic.
+
+- **Vercel**  
+  Used for hosting and deployment due to seamless Next.js support.
+
+
+
+  Setup Instructions (VERY IMPORTANT)
+## Setup Instructions
+
+### 1. Clone the Repository
 ```bash
+git clone https://github.com/drvickie/ecommerce-store.git
+cd ecommerce-store
+
+Install Dependencies 
+npm install
+
+Create Environment Variables
+Create a .env.local file in the root directory:
+NEXT_PUBLIC_PAYSTACK_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxx
+Make sure the key starts with pk_test_
+
+Run the Development Server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Open:
+http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Payment Flow Explanation (MANDATORY)
+## Payment Flow
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. User adds products to the cart.
+2. User proceeds to the checkout page.
+3. Checkout form is validated using Zod.
+4. Paystack payment modal opens in test mode.
+5. User completes payment using a Paystack test card.
+6. On successful payment:
+   - Cart is cleared
+   - User is redirected to the confirmation page
+   - Transaction reference is displayed
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Test Card Details (Nice Touch)
+## Paystack Test Card
 
-## Learn More
+Use the following test card to simulate payments:
 
-To learn more about Next.js, take a look at the following resources:
+- Card Number: 408 408 408 408 408 1
+- Expiry Date: Any future date
+- CVV: 408
+- PIN: 0000
+- OTP: 123456
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Deployment Link Section
+## Deployment
 
-## Deploy on Vercel
+The application is deployed on Vercel using Paystack in test mode.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Live URL:
+https://ecommerce-store-7jm5nyzte-victorias-projects-48dc6b56.vercel.app/
